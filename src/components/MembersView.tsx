@@ -4,6 +4,7 @@ import {
   MapPin, Phone, Mail, Award, Check, AlertCircle, RefreshCw 
 } from "lucide-react";
 import { Member, UserRole } from "../types";
+import { downloadMemberCardPdf } from "../utils/pdfGenerator";
 
 interface MembersViewProps {
   members: Member[];
@@ -326,40 +327,7 @@ export default function MembersView({
                   <span>{lang === 'fr' ? 'Imprimer la carte' : 'Print Card'}</span>
                 </button>
                 <button 
-                  onClick={() => {
-                    const cardContent = `========================================================================
-COMMUNAUTÉ DES IVOIRIENS AU NIGER (CINI)
-CARTE NUMÉRIQUE D'ADHÉRENT OFFICIELLE
-========================================================================
-
-Numéro d'adhérent : ${selectedMember.membershipCardNumber}
-Statut : ${(selectedMember.status || 'actif').toUpperCase()} (Matière Validée)
-Nom complet : ${selectedMember.lastName}
-Prénom : ${selectedMember.firstName}
-
-Informations du profil :
--------------------------
-• Téléphone : ${selectedMember.phone || 'Non renseigné'}
-• Adresse : ${selectedMember.address || 'Non renseignée'}
-• E-mail : ${selectedMember.email}
-• Date d'inscription : ${selectedMember.joinDate}
-
-Validation d'Intégrité : CINI-ID-${selectedMember.id.toUpperCase()}-VERIFIED
-Signature barcode digitale : ||||| | ||| | || ${selectedMember.membershipCardNumber}
-
-------------------------------------------------------------------------
-Carte d'identité notariale et associative délivrée par le Secrétariat
-Général CINI Niger, pour faire valoir ce que de droit.
-========================================================================`;
-                    const blob = new Blob([cardContent], { type: "text/plain;charset=utf-8" });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute("download", `Carte_Adherent_CINI_${selectedMember.firstName}_${selectedMember.lastName}.txt`);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
+                  onClick={() => downloadMemberCardPdf(selectedMember)}
                   className="py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
                   title="Télécharger la fiche d'identité sécurisée"
                 >

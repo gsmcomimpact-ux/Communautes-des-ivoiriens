@@ -4,6 +4,7 @@ import {
   AlertCircle, DollarSign, Calendar, Mail, FileCheck, Landmark, Search
 } from "lucide-react";
 import { Contribution, UserRole } from "../types";
+import { downloadContributionReminderPdf } from "../utils/pdfGenerator";
 
 interface ContributionsViewProps {
   contributions: Contribution[];
@@ -68,46 +69,7 @@ export default function ContributionsView({
   };
 
   const triggerMockReminder = (c: Contribution) => {
-    const reminderText = `========================================================================
-COMMUNAUTÉ DES IVOIRIENS AU NIGER (CINI)
-Rappel de Solidarité Mensuel - Contribution Associative
-========================================================================
-
-À l'attention de l'adhérent : ${c.memberName}
-
-Chèr(e) compatriote et membre de la CINI Niger,
-
-Sauf erreur de notre part, le versement de votre cotisation mensuelle
-associative pour la période suivante n'a pas encore été enregistré en totalité:
-
-• Période due : ${c.month}
-• Montant attendu de base : ${c.amountDue.toLocaleString()} FCFA
-• Montant actuellement réglé : ${c.amountPaid.toLocaleString()} FCFA
-• Reste à recouvrer : ${(c.amountDue - c.amountPaid).toLocaleString()} FCFA
-
-Le bon fonctionnement de notre association d'entraide communautaire,
-les fonds d'urgences de secours et le déploiement de nos projets dépendent 
-directement de la fidélité des cotisations de chacun de nos membres.
-
-Vous pouvez régulariser votre cotisation auprès du Secrétariat ou de la 
-Trésorerie Générale par dépôt de caisse direct, chèque, ou transfert mobile certifié.
-
-En vous remerciant d'avance pour votre précieux engagement à nos côtés, 
-veuillez recevoir nos salutations fraternelles les plus cordiales.
-
-Fait à Niamey, le ${new Date().toLocaleDateString('fr-FR')}
-
-Le Bureau Exécutif CINI Niger
-========================================================================`;
-
-    const blob = new Blob([reminderText], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `Rappel_Cotisation_CINI_${c.memberName.replace(/\s+/g, "_")}.txt`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadContributionReminderPdf(c);
   };
 
   return (

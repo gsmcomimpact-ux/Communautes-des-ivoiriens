@@ -4,6 +4,7 @@ import {
   Send, FileCheck, Award, AlertCircle, Sparkles, Smile 
 } from "lucide-react";
 import { Donation, UserRole, Project } from "../types";
+import { downloadDonationReceiptPdf } from "../utils/pdfGenerator";
 
 interface DonationsViewProps {
   donations: Donation[];
@@ -66,48 +67,7 @@ export default function DonationsView({
   };
 
   const triggerMockThanks = (d: Donation) => {
-    const textContent = `========================================================================
-COMMUNAUTÉ DES IVOIRIENS AU NIGER (CINI)
-Récépissé Officiel de Don de Bienfaisance & Remerciements Fiscaux
-========================================================================
-
-À l'attention de : ${d.donorName} (${d.donorEmail})
-
-Le Bureau Exécutif de la Communauté des Ivoiriens au Niger (CINI) accuse
-réception de votre généreuse contribution d'entraide solidaire.
-
-Détails de la transaction :
-----------------------------
-• Donateur : ${d.donorName}
-• Montant : ${d.amount.toLocaleString()} FCFA
-• Devise / Monnaie : Francs CFA (XOF)
-• Affectation : ${d.projectLinked ? `Projet "${d.projectLinked}"` : `Fonds Général / Actions d'Urgence`}
-• Date de dépôt : ${d.date}
-• Message transmis : "${d.message || '—'}"
-
-Code de Validation d'Intégrité : CINI-${Math.random().toString(36).substring(2, 9).toUpperCase()}-SECURE
-
-Par cette contribution, vous soutenez activement nos actions d'entraide 
-sociale, d'épanouissement éducatif et d'accompagnement de la communauté 
-ivoirienne et sahélienne à Niamey et sur l'ensemble du territoire nigérien.
-
-Ce document fait foi de reçu libératoire et donne droit aux réductions 
-sur cotisations et avantages de mécénat prévus par la charte de l'association.
-
-Fait à Niamey, le ${d.date}
-
-[Sophie Brou]
-Trésorière Générale, CINI Niger
-========================================================================`;
-
-    const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `Recu_Don_CINI_${d.donorName.replace(/\s+/g, "_")}.txt`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadDonationReceiptPdf(d);
   };
 
   // Filters
