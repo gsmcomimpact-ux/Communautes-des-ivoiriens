@@ -213,10 +213,10 @@ export default function MembersView({
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                          m.status === 'actif' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                          (m.status === 'suspendu' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-100 text-slate-600')
+                          (m.status || 'actif') === 'actif' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                          ((m.status || 'actif') === 'suspendu' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-100 text-slate-600')
                         }`}>
-                          {m.status.toUpperCase()}
+                          {(m.status || 'actif').toUpperCase()}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
@@ -312,8 +312,42 @@ export default function MembersView({
                   <span>{lang === 'fr' ? 'Imprimer la carte' : 'Print Card'}</span>
                 </button>
                 <button 
-                  onClick={() => alert(`Fichier PDF généré pour : ${selectedMember.firstName} ${selectedMember.lastName}`)}
+                  onClick={() => {
+                    const cardContent = `========================================================================
+COMMUNAUTÉ DES IVOIRIENS AU NIGER (CINI)
+CARTE NUMÉRIQUE D'ADHÉRENT OFFICIELLE
+========================================================================
+
+Numéro d'adhérent : ${selectedMember.membershipCardNumber}
+Statut : ${(selectedMember.status || 'actif').toUpperCase()} (Matière Validée)
+Nom complet : ${selectedMember.lastName}
+Prénom : ${selectedMember.firstName}
+
+Informations du profil :
+-------------------------
+• Téléphone : ${selectedMember.phone || 'Non renseigné'}
+• Adresse : ${selectedMember.address || 'Non renseignée'}
+• E-mail : ${selectedMember.email}
+• Date d'inscription : ${selectedMember.joinDate}
+
+Validation d'Intégrité : CINI-ID-${selectedMember.id.toUpperCase()}-VERIFIED
+Signature barcode digitale : ||||| | ||| | || ${selectedMember.membershipCardNumber}
+
+------------------------------------------------------------------------
+Carte d'identité notariale et associative délivrée par le Secrétariat
+Général CINI Niger, pour faire valoir ce que de droit.
+========================================================================`;
+                    const blob = new Blob([cardContent], { type: "text/plain;charset=utf-8" });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", `Carte_Adherent_CINI_${selectedMember.firstName}_${selectedMember.lastName}.txt`);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
                   className="py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  title="Télécharger la fiche d'identité sécurisée"
                 >
                   <Download className="w-3.5 h-3.5" />
                 </button>

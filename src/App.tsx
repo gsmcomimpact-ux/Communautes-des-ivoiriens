@@ -84,15 +84,15 @@ export default function App() {
   }, []);
 
   // API Call helpers syncing with server.ts
-  const apiPost = async (endpoint: string, payload: any) => {
+  const apiCall = async (endpoint: string, method: "POST" | "PUT" | "DELETE", payload?: any) => {
     try {
       const response = await fetch(endpoint, {
-        method: "POST",
+        method,
         headers: { 
           "Content-Type": "application/json",
           "x-user-role": userRole // pass active role directly to endpoints!
         },
-        body: JSON.stringify(payload)
+        body: (method !== "DELETE" && payload) ? JSON.stringify(payload) : undefined
       });
       if (response.ok) {
         const result = await response.json();
@@ -109,48 +109,52 @@ export default function App() {
     }
   };
 
+  const apiPost = (endpoint: string, payload: any) => apiCall(endpoint, "POST", payload);
+  const apiPut = (endpoint: string, payload: any) => apiCall(endpoint, "PUT", payload);
+  const apiDelete = (endpoint: string) => apiCall(endpoint, "DELETE");
+
   // Actions handlers
   const handleAddMember = async (memberData: Partial<Member>) => {
-    await apiPost("/api/members", memberData);
+    await apiPost("/api/members", { member: memberData });
   };
 
   const handleUpdateMember = async (id: string, updatedData: Partial<Member>) => {
-    await apiPost(`/api/members/${id}`, updatedData);
+    await apiPut(`/api/members/${id}`, { member: updatedData });
   };
 
   const handleDeleteMember = async (id: string) => {
     if (confirm("Confirmez-vous la suspension ou suppression administrative de cet adhérent ?")) {
-      await apiPost(`/api/members/${id}/delete`, {});
+      await apiDelete(`/api/members/${id}`);
     }
   };
 
   const handleAddTransaction = async (txData: Partial<FinancialTransaction>) => {
-    await apiPost("/api/finances", txData);
+    await apiPost("/api/finances", { tx: txData });
   };
 
   const handleUpdateContribution = async (id: string, updatedData: Partial<Contribution>) => {
-    await apiPost(`/api/contributions/${id}`, updatedData);
+    await apiPut(`/api/contributions/${id}`, { updatedData });
   };
 
   const handleAddDonation = async (donationData: Partial<Donation>) => {
-    await apiPost("/api/donations", donationData);
+    await apiPost("/api/donations", { donation: donationData });
   };
 
   const handleAddProject = async (projData: Partial<Project>) => {
-    await apiPost("/api/projects", projData);
+    await apiPost("/api/projects", { project: projData });
   };
 
   const handleUpdateProject = async (id: string, projData: Partial<Project>) => {
-    await apiPost(`/api/projects/${id}`, projData);
+    await apiPut(`/api/projects/${id}`, { project: projData });
   };
 
   const handleAddDocument = async (docData: Partial<DocItem>) => {
-    await apiPost("/api/documents", docData);
+    await apiPost("/api/documents", { doc: docData });
   };
 
   const handleDeleteDocument = async (id: string) => {
     if (confirm("Supprimer ce document d'archives ?")) {
-      await apiPost(`/api/documents/${id}/delete`, {});
+      await apiDelete(`/api/documents/${id}`);
     }
   };
 

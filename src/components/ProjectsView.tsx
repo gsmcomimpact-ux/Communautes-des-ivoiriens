@@ -182,7 +182,7 @@ export default function ProjectsView({
                     <span className={`px-2 py-0.5 text-[8px] font-bold rounded-full ${
                       isSelected ? 'bg-teal-500/20 text-teal-300' : 'bg-slate-100 text-slate-700'
                     }`}>
-                      {p.status.toUpperCase()}
+                      {(p.status || 'planifié').toUpperCase()}
                     </span>
                     <span className={`text-[10px] font-mono font-bold ${isSelected ? 'text-teal-400' : 'text-teal-600'}`}>{p.expenses.toLocaleString()} F / {p.budget.toLocaleString()} F</span>
                   </div>
@@ -270,10 +270,10 @@ export default function ProjectsView({
 
                         {/* Status badge */}
                         <span className={`px-2 py-0.5 text-[8px] font-black rounded-full ${
-                          act.status === 'complété' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                          (act.status === 'en_cours' ? 'bg-sky-50 text-sky-700 border border-sky-100' : 'bg-slate-200/80 text-slate-600')
+                          (act.status || 'à_faire') === 'complété' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                          ((act.status || 'à_faire') === 'en_cours' ? 'bg-sky-50 text-sky-700 border border-sky-100' : 'bg-slate-200/80 text-slate-600')
                         }`}>
-                          {act.status.toUpperCase()}
+                          {(act.status || 'à_faire').toUpperCase()}
                         </span>
                       </div>
                     ))

@@ -311,6 +311,11 @@ app.post("/api/security/backup", (req, res) => {
   res.json({ success: true, lastBackup: db.security.lastBackup });
 });
 
+app.get("/api/database", (req, res) => {
+  const db = getDB();
+  res.json(db);
+});
+
 // 3. MEMBERS API
 app.get("/api/members", (req, res) => {
   const db = getDB();
@@ -318,14 +323,25 @@ app.get("/api/members", (req, res) => {
 });
 
 app.post("/api/members", (req, res) => {
-  const { member, actorEmail, actorRole } = req.body;
+  const { member: bodyMember, actorEmail: bodyActorEmail, actorRole: bodyActorRole } = req.body;
+  const member = bodyMember || req.body || {};
   const db = getDB();
+
+  const actorEmail = String(req.headers["x-user-email"] || bodyActorEmail || "secrétaire@association.org");
+  const actorRole = (req.headers["x-user-role"] as UserRole) || (bodyActorRole as UserRole) || "secrétaire";
   
   const newMember: Member = {
-    ...member,
     id: `m-${Date.now()}`,
+    firstName: member.firstName || "",
+    lastName: member.lastName || "",
+    email: member.email || "",
+    phone: member.phone || "",
+    status: member.status || "actif",
+    address: member.address || "",
+    photoUrl: member.photoUrl || "",
+    notes: member.notes || "",
     joinDate: new Date().toISOString().split('T')[0],
-    membershipCardNumber: `ASS-2026-${Math.floor(100 + Math.random() * 900)}`
+    membershipCardNumber: `CINI-2026-${Math.floor(100 + Math.random() * 900)}`
   };
   
   db.members.push(newMember);
@@ -346,19 +362,34 @@ app.post("/api/members", (req, res) => {
     saveDB(db);
   }
 
-  logAction(actorEmail || "secrétaire@association.org", actorRole || "secrétaire", "Création de membre", `Enregistrement du nouveau membre ${newMember.firstName} ${newMember.lastName}.`);
+  logAction(actorEmail, actorRole, "Création de membre", `Enregistrement du nouveau membre ${newMember.firstName} ${newMember.lastName}.`);
   res.json(newMember);
 });
 
 app.put("/api/members/:id", (req, res) => {
   const { id } = req.params;
-  const { member, actorEmail, actorRole } = req.body;
+  const { member: bodyMember, actorEmail: bodyActorEmail, actorRole: bodyActorRole } = req.body;
+  const member = bodyMember || req.body || {};
   const db = getDB();
+
+  const actorEmail = String(req.headers["x-user-email"] || bodyActorEmail || "secrétaire@association.org");
+  const actorRole = (req.headers["x-user-role"] as UserRole) || (bodyActorRole as UserRole) || "secrétaire";
+
   const index = db.members.findIndex(m => m.id === id);
   if (index !== -1) {
-    db.members[index] = { ...db.members[index], ...member };
+    db.members[index] = { 
+      ...db.members[index], 
+      firstName: member.firstName !== undefined ? member.firstName : db.members[index].firstName,
+      lastName: member.lastName !== undefined ? member.lastName : db.members[index].lastName,
+      email: member.email !== undefined ? member.email : db.members[index].email,
+      phone: member.phone !== undefined ? member.phone : db.members[index].phone,
+      status: member.status !== undefined ? member.status : db.members[index].status,
+      address: member.address !== undefined ? member.address : db.members[index].address,
+      notes: member.notes !== undefined ? member.notes : db.members[index].notes,
+      photoUrl: member.photoUrl !== undefined ? member.photoUrl : db.members[index].photoUrl,
+    };
     saveDB(db);
-    logAction(actorEmail || "secrétaire@association.org", actorRole || "secrétaire", "Mise à jour membre", `Modification de la fiche du membre ${db.members[index].firstName} ${db.members[index].lastName}.`);
+    logAction(actorEmail, actorRole, "Mise à jour membre", `Modification de la fiche du membre ${db.members[index].firstName} ${db.members[index].lastName}.`);
     return res.json(db.members[index]);
   }
   res.status(404).json({ error: "Membre non trouvé" });

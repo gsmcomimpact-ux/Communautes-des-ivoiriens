@@ -22,18 +22,39 @@ export default function SecurityView({
 }: SecurityViewProps) {
   const [mfaEnabled, setMfaEnabled] = useState(true);
   const [isBackupLoading, setIsBackupLoading] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [backupDate, setBackupDate] = useState(security.lastBackup);
 
   const handleBackup = () => {
     setIsBackupLoading(true);
+    setShowSuccessToast(false);
     setTimeout(() => {
       onTriggerBackup();
+      setBackupDate(new Date().toISOString());
       setIsBackupLoading(false);
-      alert("Sauvegarde d'urgence chiffrée consolidée terminée avec succès. Point de contrôle valide.");
+      setShowSuccessToast(true);
+      // Automatically clear after 5s
+      setTimeout(() => setShowSuccessToast(false), 5000);
     }, 1200);
   };
 
   return (
     <div className="space-y-6 text-slate-800 text-xs">
+
+      {showSuccessToast && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-800 font-sans font-semibold flex items-center justify-between shadow-xs text-left">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-emerald-500 text-white rounded-lg animate-bounce">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="font-bold text-xs text-emerald-900">Sauvegarde Réussie !</p>
+              <p className="text-[10px] text-emerald-700 font-mono">Archive d'urgence consolidée, point de contrôle validé et encrypté AES-256 GCM.</p>
+            </div>
+          </div>
+          <button onClick={() => setShowSuccessToast(false)} className="text-emerald-500 hover:text-emerald-800 font-bold ml-4 text-sm cursor-pointer">✕</button>
+        </div>
+      )}
       
       {/* Top dashboard panels layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -110,7 +131,7 @@ export default function SecurityView({
                 <span>{isBackupLoading ? 'Sauvegarde chiffrée...' : 'Créer point d’archive'}</span>
               </button>
               
-              <p className="text-[10px] text-slate-404 italic text-right">Dernier jalon: {new Date(security.lastBackup).toLocaleString('fr-FR')}</p>
+              <p className="text-[10px] text-slate-404 italic text-right">Dernier jalon: {new Date(backupDate).toLocaleString('fr-FR')}</p>
             </div>
           </div>
         </div>
@@ -158,7 +179,7 @@ export default function SecurityView({
             <div key={log.id} className="hover:bg-slate-900 py-1 px-1.5 rounded transition">
               <span className="text-slate-500">[{new Date(log.timestamp).toLocaleTimeString()}]</span>{" "}
               <span className="text-teal-400 font-bold">{log.userEmail}</span>{" "}
-              <span className="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded text-[9px] mx-1">{log.role.toUpperCase()}</span>{" "}
+              <span className="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded text-[9px] mx-1">{(log.role || 'secrétaire').toUpperCase()}</span>{" "}
               <span className="text-amber-500 font-semibold">{log.action}:</span>{" "}
               <span className="text-slate-200">{log.details}</span>
             </div>

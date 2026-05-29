@@ -31,8 +31,8 @@ export default function DashboardView({
   const totalOut = finances.filter(f => f.type === 'dépense').reduce((sum, f) => sum + f.amount, 0);
   const netBalance = totalIn - totalOut;
 
-  const activeCount = members.filter(m => m.status === 'actif').length;
-  const activeProjectsCount = projects.filter(p => p.status === 'en_cours').length;
+  const activeCount = members.filter(m => (m.status || 'actif') === 'actif').length;
+  const activeProjectsCount = projects.filter(p => (p.status || 'en_cours') === 'en_cours').length;
 
   // Monthly stats for custom SVG grid graph
   // Let's bucket some virtual historical months (e.g., Mar, Apr, May)
@@ -339,8 +339,8 @@ export default function DashboardView({
               <div key={p.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
                 <div className="flex items-start justify-between">
                   <h5 className="font-bold text-sm text-slate-800 line-clamp-1">{p.title}</h5>
-                  <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full ${p.status === 'en_cours' ? 'bg-sky-100 text-sky-800' : 'bg-green-100 text-green-800'}`}>
-                    {p.status.toUpperCase()}
+                  <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full ${(p.status || 'en_cours') === 'en_cours' ? 'bg-sky-100 text-sky-800' : 'bg-green-100 text-green-800'}`}>
+                    {(p.status || 'en_cours').toUpperCase()}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 line-clamp-2">{p.description}</p>

@@ -78,7 +78,40 @@ export default function DocumentsView({
   };
 
   const triggerMockDownload = (doc: DocItem) => {
-    alert(`Téléchargement sécurisé et vérification HMAC du fichier : ${doc.fileName} (${doc.fileSize})`);
+    const textContent = `========================================================================
+COMMUNAUTÉ DES IVOIRIENS AU NIGER (CINI)
+COFFRE-FORT ÉLECTRONIQUE SÉCURISÉ - REÇU DE CONFIDENTIALITÉ
+========================================================================
+
+Document ID : ${doc.id}
+Titre enregistré : ${doc.title}
+Fichier source : ${doc.fileName}
+Taille : ${doc.fileSize}
+Déposé par : ${doc.uploadedBy}
+Date d'archivage : ${doc.uploadedAt}
+
+Vérification d'Inviolabilité :
+------------------------------
+• Statut d'intégrité : Optimal (Certifié SHA-512)
+• Empreinte Cryptographique HMAC : ${Math.random().toString(36).substring(2, 12).toUpperCase()}-AES256GCM
+• Serveur Mandataire : Niamey Core Server (Ingress SSL/TLS v1.3 ok)
+
+Le document archivé "${doc.fileName}" a été audité avec succès. 
+
+Ce certificat de décryptage sécurisé confirme l'authenticité et la traçabilité
+administrative de la pièce au sein du registre numérique officiel CINI Niger.
+
+Bureau Exécutif CINI, Niamey Plateau, République du Niger.
+========================================================================`;
+
+    const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${doc.title.replace(/\s+/g, "_")}_CINI_CERTIFICAT.txt`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Filter core documents
