@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;805;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Print optimizations standard styling */
+@media print {
+  #role-changer-banner, 
+  #app-sidebar, 
+  #register-member-btn,
+  #register-donation-btn,
+  #launch-project-btn,
+  #risk-alerts,
+  #btn-post-tx,
+  button, 
+  input, 
+  select {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    font-size: 10pt !important;
+  }
+  #print-area {
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  #digital-member-card {
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

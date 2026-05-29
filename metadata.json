@@ -1,0 +1,6 @@
+{
+  "name": "CINI - Ivoiriens au Niger",
+  "description": "Portail officiel de la Communauté des Ivoiriens au Niger (CINI). Gestion sécurisée des adhérents, cotisations mensuelles, comptabilité d'entraide, projets de solidarité et rapports d'activités assistés par IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
