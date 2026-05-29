@@ -10,8 +10,8 @@ interface MembersViewProps {
   lang: 'fr' | 'en';
   dict: any;
   userRole: UserRole;
-  onAddMember: (member: Partial<Member>) => void;
-  onUpdateMember: (id: string, member: Partial<Member>) => void;
+  onAddMember: (member: any) => Promise<any> | any;
+  onUpdateMember: (id: string, member: any) => Promise<any> | any;
   onDeleteMember: (id: string) => void;
 }
 
@@ -68,7 +68,7 @@ export default function MembersView({
     setIsFormOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formFirstName || !formLastName || !formEmail) return;
 
@@ -82,12 +82,26 @@ export default function MembersView({
       notes: formNotes
     };
 
-    if (editingId) {
-      onUpdateMember(editingId, payload);
-    } else {
-      onAddMember(payload);
+    try {
+      if (editingId) {
+        await onUpdateMember(editingId, { member: payload });
+      } else {
+        await onAddMember({ member: payload });
+      }
+      
+      // Explicitly clear the input form states immediately after successful API request
+      setFormFirstName("");
+      setFormLastName("");
+      setFormEmail("");
+      setFormPhone("");
+      setFormStatus("actif");
+      setFormAddress("");
+      setFormNotes("");
+      setEditingId(null);
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error("Error saving member:", error);
     }
-    setIsFormOpen(false);
   };
 
   // Filter members

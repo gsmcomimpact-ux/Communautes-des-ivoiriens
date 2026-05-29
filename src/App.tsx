@@ -114,12 +114,18 @@ export default function App() {
   const apiDelete = (endpoint: string) => apiCall(endpoint, "DELETE");
 
   // Actions handlers
-  const handleAddMember = async (memberData: Partial<Member>) => {
-    await apiPost("/api/members", { member: memberData });
+  const handleAddMember = async (memberData: any) => {
+    const payload = (memberData && typeof memberData === "object" && "member" in memberData)
+      ? memberData
+      : { member: memberData };
+    await apiPost("/api/members", payload);
   };
 
-  const handleUpdateMember = async (id: string, updatedData: Partial<Member>) => {
-    await apiPut(`/api/members/${id}`, { member: updatedData });
+  const handleUpdateMember = async (id: string, updatedData: any) => {
+    const payload = (updatedData && typeof updatedData === "object" && "member" in updatedData)
+      ? updatedData
+      : { member: updatedData };
+    await apiPut(`/api/members/${id}`, payload);
   };
 
   const handleDeleteMember = async (id: string) => {
